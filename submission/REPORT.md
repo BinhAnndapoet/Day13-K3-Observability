@@ -23,11 +23,13 @@
 
 ## 4. Prompt versioning
 
-- Prompt name:
-- Version/label baseline:
-- Version/label candidate:
-- Trace ID của mỗi version:
-- Bằng chứng đổi label hoặc rollback:
+- Prompt name: `day13-chat`
+- Version/label baseline: `v1` / `production`, `baseline`
+- Version/label candidate: `v2` / `candidate`
+- Trace ID của mỗi version: 
+  - Trace của v1 (production): Tham chiếu qua correlation_id là `req-7138a0c4` (Bạn có thể tra correlation_id này trên Langfuse UI để lấy Trace ID thật, hoặc giữ nguyên req-id)
+  - Trace của v2 (candidate): Tham chiếu qua correlation_id là `req-8b359f02` (Tương tự, tra cứu trên Langfuse UI)
+- Bằng chứng đổi label hoặc rollback: Xem ảnh `submission/evidence/prompt_rollback.png` (Ảnh chụp màn hình thao tác đổi label trên giao diện Langfuse)
 
 ## 5. Dashboard, SLO và alerts
 
