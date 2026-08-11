@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 13 AI Observability — Baseline (truoc incident)</title>
+<style>
+:root { color-scheme: light dark; }
+.viz-root, body {
+  --surface-1:#fcfcfb; --plane:#f9f9f7;
+  --text-primary:#0b0b0b; --text-secondary:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+  --series-1:#2a78d6; --series-2:#eb6834;
+  --ordinal-1:#86b6ef; --ordinal-2:#2a78d6; --ordinal-3:#104281;
+  --status-good:#0ca30c; --status-critical:#d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  .viz-root, body {
+    --surface-1:#1a1a19; --plane:#0d0d0d;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+    --series-1:#3987e5; --series-2:#d95926;
+    --ordinal-1:#9ec5f4; --ordinal-2:#3987e5; --ordinal-3:#184f95;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin:0; padding:28px; background:var(--plane); color:var(--text-primary);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+h1 { font-size:22px; margin:0 0 6px; }
+h2 { font-size:15px; margin:0; }
+.meta, .note, .empty { color:var(--text-secondary); font-size:12px; margin:4px 0 0; }
+.page-head { margin-bottom:20px; }
+.page-head .meta { font-size:13px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin-bottom:20px; }
+.kpi, .panel {
+  background:var(--surface-1); border:1px solid var(--border); border-radius:10px; padding:16px;
+}
+.kpi .kpi-label { color:var(--text-secondary); font-size:12px; }
+.kpi .kpi-value { font-size:30px; margin:6px 0 8px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr)); gap:16px; }
+.panel-head { margin-bottom:10px; }
+.chart { width:100%; height:auto; display:block; margin-top:6px; }
+.chart-meter { max-height:110px; }
+.grid-line { stroke:var(--grid); stroke-width:1; }
+.axis-line { stroke:var(--axis); stroke-width:1; }
+.threshold { stroke:var(--status-critical); stroke-width:2; }
+.threshold-label { fill:var(--status-critical); font-size:11px; }
+.tick, .cat-label { fill:var(--muted); font-size:11px; font-variant-numeric:tabular-nums; }
+.cat-label { text-anchor:middle; }
+.bar-label { fill:var(--text-secondary); font-size:11px; text-anchor:middle; }
+.hero { fill:var(--text-primary); font-size:26px; font-weight:600; }
+.meter-track { fill:var(--grid); }
+.bar { stroke:var(--surface-1); stroke-width:2; paint-order:stroke; }
+.chip { display:inline-block; margin-top:8px; padding:3px 9px; border-radius:999px;
+  font-size:12px; border:1px solid var(--border); color:var(--text-primary); }
+.chip-good { background:color-mix(in srgb, var(--status-good) 14%, transparent); }
+.chip-critical { background:color-mix(in srgb, var(--status-critical) 14%, transparent); }
+.legend { display:flex; gap:14px; font-size:12px; color:var(--text-secondary); margin:0; }
+.key { display:inline-flex; align-items:center; gap:6px; }
+.swatch { width:10px; height:10px; border-radius:2px; display:inline-block; }
+.table-view { margin-top:10px; font-size:12px; color:var(--text-secondary); }
+.table-view summary { cursor:pointer; }
+table { border-collapse:collapse; margin-top:8px; width:100%; font-variant-numeric:tabular-nums; }
+th, td { text-align:left; padding:4px 8px; border-bottom:1px solid var(--grid); }
+</style></head>
+<body>
+<header class="page-head">
+  <h1>Day 13 AI Observability — Baseline (truoc incident)</h1>
+  <p class="meta">Time range: <strong>2026-08-11 04:09:16Z → 2026-08-11 04:13:51Z</strong> (contract:
+  60 phut, refresh 30s) &middot;
+  nguon: <strong>data/logs.jsonl</strong> &middot;
+  101 log records / 50 request /
+  0 loi &middot; dung theo contract config/dashboard.yaml</p>
+</header>
+<div class="kpis"><article class="kpi"><p class="kpi-label">Latency percentiles</p><p class="kpi-value">151 ms</p><span class="chip chip-good"><span aria-hidden="true">✓</span> Dat nguong (&lt;= 3,000 ms)</span></article><article class="kpi"><p class="kpi-label">Error rate and breakdown</p><p class="kpi-value">0.00%</p><span class="chip chip-good"><span aria-hidden="true">✓</span> Dat nguong (&lt;= 2.00%)</span></article><article class="kpi"><p class="kpi-label">Cost over time</p><p class="kpi-value">$0.1022</p><span class="chip chip-good"><span aria-hidden="true">✓</span> Dat nguong (&lt;= $2.5000)</span></article><article class="kpi"><p class="kpi-label">Quality proxy</p><p class="kpi-value">0.88</p><span class="chip chip-good"><span aria-hidden="true">✓</span> Dat nguong (&gt;= 0.75)</span></article></div>
+<div class="grid"><section class="panel"><header class="panel-head"><h2>Latency percentiles</h2><p class="meta">Don vi: ms &middot; nguon: data/logs.jsonl &middot; event: response_sent</p><span class="chip chip-good"><span aria-hidden="true">✓</span> Dat nguong (&lt;= 3,000 ms)</span></header><div class="viz-root"><svg viewBox="0 0 660 240" role="img" preserveAspectRatio="xMidYMid meet" class="chart"><line class="grid-line" x1="8.0" y1="28.0" x2="596.0" y2="28.0"/><text class="tick" x="604.0" y="32.0">205 ms</text><line class="grid-line" x1="8.0" y1="117.0" x2="596.0" y2="117.0"/><text class="tick" x="604.0" y="121.0">102 ms</text><line class="axis-line" x1="8.0" y1="206.0" x2="596.0" y2="206.0"/><text class="tick" x="604.0" y="210.0">0 ms</text><path class="bar" d="M83.0,206.0 V79.8 Q83.0,75.8 87.0,75.8 H125.0 Q129.0,75.8 129.0,79.8 V206.0 Z" fill="var(--ordinal-1)"><title>P50: 150 ms</title></path><text class="bar-label" x="106.0" y="67.8">150 ms</text><text class="cat-label" x="106.0" y="226.0">P50</text><path class="bar" d="M279.0,206.0 V78.9 Q279.0,74.9 283.0,74.9 H321.0 Q325.0,74.9 325.0,78.9 V206.0 Z" fill="var(--ordinal-2)"><title>P95: 151 ms</title></path><text class="bar-label" x="302.0" y="66.9">151 ms</text><text class="cat-label" x="302.0" y="226.0">P95</text><path class="bar" d="M475.0,206.0 V67.6 Q475.0,63.6 479.0,63.6 H517.0 Q521.0,63.6 521.0,67.6 V206.0 Z" fill="var(--ordinal-3)"><title>P99: 164 ms</title></path><text class="bar-label" x="498.0" y="55.6">164 ms</text><text class="cat-label" x="498.0" y="226.0">P99</text><text class="threshold-label" x="8.0" y="14">SLO 3,000 ms — con cach xa nguong, nam ngoai thang</text></svg></div><details class="table-view"><summary>Xem dang bang</summary><table><thead><tr><th>Phut</th><th>P95 latency (ms)</th></tr></thead><tbody><tr><td>04:10</td><td>151</td></tr><tr><td>04:11</td><td>151</td></tr><tr><td>04:12</td><td>151</td></tr><tr><td>04:13</td><td>151</td></tr></tbody></table></details></section><section class="panel"><header class="panel-head"><h2>Request traffic</h2><p class="meta">Don vi: requests_per_minute &middot; nguon: data/logs.jsonl &middot; event: request_received</p><span class="chip chip-good"><span aria-hidden="true">✓</span> Dat nguong (&gt;= 1.0/ph)</span></header><div class="viz-root"><svg viewBox="0 0 660 240" role="img" preserveAspectRatio="xMidYMid meet" class="chart"><line class="grid-line" x1="8.0" y1="28.0" x2="596.0" y2="28.0"/><text class="tick" x="604.0" y="32.0">25</text><line class="grid-line" x1="8.0" y1="117.0" x2="596.0" y2="117.0"/><text class="tick" x="604.0" y="121.0">12</text><line class="axis-line" x1="8.0" y1="206.0" x2="596.0" y2="206.0"/><text class="tick" x="604.0" y="210.0">0</text><path class="bar" d="M58.5,206.0 V138.8 Q58.5,134.8 62.5,134.8 H100.5 Q104.5,134.8 104.5,138.8 V206.0 Z" fill="var(--series-1)"><title>04:10: 10</title></path><text class="bar-label" x="81.5" y="126.8">10</text><text class="cat-label" x="81.5" y="226.0">04:10</text><path class="bar" d="M205.5,206.0 V138.8 Q205.5,134.8 209.5,134.8 H247.5 Q251.5,134.8 251.5,138.8 V206.0 Z" fill="var(--series-1)"><title>04:11: 10</title></path><text class="bar-label" x="228.5" y="126.8">10</text><text class="cat-label" x="228.5" y="226.0">04:11</text><path class="bar" d="M352.5,206.0 V67.6 Q352.5,63.6 356.5,63.6 H394.5 Q398.5,63.6 398.5,67.6 V206.0 Z" fill="var(--series-1)"><title>04:12: 20</title></path><text class="bar-label" x="375.5" y="55.6">20</text><text class="cat-label" x="375.5" y="226.0">04:12</text><path class="bar" d="M499.5,206.0 V138.8 Q499.5,134.8 503.5,134.8 H541.5 Q545.5,134.8 545.5,138.8 V206.0 Z" fill="var(--series-1)"><title>04:13: 10</title></path><text class="bar-label" x="522.5" y="126.8">10</text><text class="cat-label" x="522.5" y="226.0">04:13</text></svg></div><details class="table-view"><summary>Xem dang bang</summary><table><thead><tr><th>Phut</th><th>So request</th></tr></thead><tbody><tr><td>04:10</td><td>10</td></tr><tr><td>04:11</td><td>10</td></tr><tr><td>04:12</td><td>20</td></tr><tr><td>04:13</td><td>10</td></tr></tbody></table></details></section><section class="panel"><header class="panel-head"><h2>Error rate and breakdown</h2><p class="meta">Don vi: percent &middot; nguon: data/logs.jsonl &middot; event: request_received, request_failed</p><span class="chip chip-good"><span aria-hidden="true">✓</span> Dat nguong (&lt;= 2.00%)</span></header><div class="viz-root"><svg viewBox="0 0 660 96" role="img" preserveAspectRatio="xMidYMid meet" class="chart chart-meter"><text class="hero" x="8.0" y="30">0.00%</text><rect class="meter-track" x="8.0" y="46.0" width="644.0" height="18.0" rx="4"/><path class="bar" d="M8.0,64.0 V47.0 Q8.0,46.0 9.0,46.0 H9.0 Q10.0,46.0 10.0,47.0 V64.0 Z" fill="var(--status-good)"><title>Gia tri hien tai: 0.00%</title></path><line class="threshold" x1="485.0" y1="38.0" x2="485.0" y2="72.0"/><text class="threshold-label" x="485.0" y="88.0" text-anchor="middle">toi da 2.00%</text></svg></div><details class="table-view"><summary>Xem dang bang</summary><table><thead><tr><th>Loai loi</th><th>So lan</th></tr></thead><tbody><tr><td>(khong co loi)</td><td>0</td></tr></tbody></table></details></section><section class="panel"><header class="panel-head"><h2>Cost over time</h2><p class="meta">Don vi: usd &middot; nguon: data/logs.jsonl &middot; event: response_sent</p><span class="chip chip-good"><span aria-hidden="true">✓</span> Dat nguong (&lt;= $2.5000)</span></header><div class="viz-root"><svg viewBox="0 0 660 240" role="img" preserveAspectRatio="xMidYMid meet" class="chart"><line class="grid-line" x1="8.0" y1="28.0" x2="596.0" y2="28.0"/><text class="tick" x="604.0" y="32.0">$0.0510</text><line class="grid-line" x1="8.0" y1="117.0" x2="596.0" y2="117.0"/><text class="tick" x="604.0" y="121.0">$0.0255</text><line class="axis-line" x1="8.0" y1="206.0" x2="596.0" y2="206.0"/><text class="tick" x="604.0" y="210.0">$0.0000</text><path class="bar" d="M58.5,206.0 V134.5 Q58.5,130.5 62.5,130.5 H100.5 Q104.5,130.5 104.5,134.5 V206.0 Z" fill="var(--series-1)"><title>04:10: $0.0216</title></path><text class="bar-label" x="81.5" y="122.5">$0.0216</text><text class="cat-label" x="81.5" y="226.0">04:10</text><path class="bar" d="M205.5,206.0 V142.9 Q205.5,138.9 209.5,138.9 H247.5 Q251.5,138.9 251.5,142.9 V206.0 Z" fill="var(--series-1)"><title>04:11: $0.0192</title></path><text class="bar-label" x="228.5" y="130.9">$0.0192</text><text class="cat-label" x="228.5" y="226.0">04:11</text><path class="bar" d="M352.5,206.0 V67.6 Q352.5,63.6 356.5,63.6 H394.5 Q398.5,63.6 398.5,67.6 V206.0 Z" fill="var(--series-1)"><title>04:12: $0.0408</title></path><text class="bar-label" x="375.5" y="55.6">$0.0408</text><text class="cat-label" x="375.5" y="226.0">04:12</text><path class="bar" d="M499.5,206.0 V138.4 Q499.5,134.4 503.5,134.4 H541.5 Q545.5,134.4 545.5,138.4 V206.0 Z" fill="var(--series-1)"><title>04:13: $0.0205</title></path><text class="bar-label" x="522.5" y="126.4">$0.0205</text><text class="cat-label" x="522.5" y="226.0">04:13</text></svg></div><p class="note">Tong cua so: <strong>$0.1022</strong></p><details class="table-view"><summary>Xem dang bang</summary><table><thead><tr><th>Phut</th><th>Cost (USD)</th></tr></thead><tbody><tr><td>04:10</td><td>0.021645</td></tr><tr><td>04:11</td><td>0.019245</td></tr><tr><td>04:12</td><td>0.040815</td></tr><tr><td>04:13</td><td>0.020520</td></tr></tbody></table></details></section><section class="panel"><header class="panel-head"><h2>Input and output tokens</h2><p class="meta">Don vi: tokens &middot; nguon: data/logs.jsonl &middot; event: response_sent</p><span class="chip chip-good"><span aria-hidden="true">✓</span> Dat nguong (&lt;= 50,000)</span></header><div class="viz-root"><p class="legend"><span class="key"><span class="swatch" style="background:var(--series-1)"></span>tokens_in</span><span class="key"><span class="swatch" style="background:var(--series-2)"></span>tokens_out</span></p><svg viewBox="0 0 660 240" role="img" preserveAspectRatio="xMidYMid meet" class="chart"><line class="grid-line" x1="8.0" y1="28.0" x2="596.0" y2="28.0"/><text class="tick" x="604.0" y="32.0">8,106</text><line class="grid-line" x1="8.0" y1="117.0" x2="596.0" y2="117.0"/><text class="tick" x="604.0" y="121.0">4,053</text><line class="axis-line" x1="8.0" y1="206.0" x2="596.0" y2="206.0"/><text class="tick" x="604.0" y="210.0">0</text><path class="bar" d="M132.0,206.0 V173.8 Q132.0,169.8 136.0,169.8 H174.0 Q178.0,169.8 178.0,173.8 V206.0 Z" fill="var(--series-1)"><title>tokens_in: 1,650</title></path><text class="bar-label" x="155.0" y="161.8">1,650</text><text class="cat-label" x="155.0" y="226.0">tokens_in</text><path class="bar" d="M426.0,206.0 V67.6 Q426.0,63.6 430.0,63.6 H468.0 Q472.0,63.6 472.0,67.6 V206.0 Z" fill="var(--series-2)"><title>tokens_out: 6,485</title></path><text class="bar-label" x="449.0" y="55.6">6,485</text><text class="cat-label" x="449.0" y="226.0">tokens_out</text></svg></div><details class="table-view"><summary>Xem dang bang</summary><table><thead><tr><th>Field</th><th>Tong token</th></tr></thead><tbody><tr><td>tokens_in</td><td>1,650</td></tr><tr><td>tokens_out</td><td>6,485</td></tr></tbody></table></details></section><section class="panel"><header class="panel-head"><h2>Quality proxy</h2><p class="meta">Don vi: score_0_to_1 &middot; nguon: data/logs.jsonl &middot; event: response_sent</p><span class="chip chip-good"><span aria-hidden="true">✓</span> Dat nguong (&gt;= 0.75)</span></header><div class="viz-root"><svg viewBox="0 0 660 96" role="img" preserveAspectRatio="xMidYMid meet" class="chart chart-meter"><text class="hero" x="8.0" y="30">0.88</text><rect class="meter-track" x="8.0" y="46.0" width="644.0" height="18.0" rx="4"/><path class="bar" d="M8.0,64.0 V50.0 Q8.0,46.0 12.0,46.0 H481.0 Q485.0,46.0 485.0,50.0 V64.0 Z" fill="var(--status-good)"><title>Gia tri hien tai: 0.88</title></path><line class="threshold" x1="414.6" y1="38.0" x2="414.6" y2="72.0"/><text class="threshold-label" x="414.6" y="88.0" text-anchor="middle">toi thieu 0.75</text></svg></div><details class="table-view"><summary>Xem dang bang</summary><table><thead><tr><th>Chi so</th><th>Gia tri</th></tr></thead><tbody><tr><td>quality_score trung binh</td><td>0.8800</td></tr><tr><td>So mau</td><td>50</td></tr></tbody></table></details></section></div>
+</body></html>

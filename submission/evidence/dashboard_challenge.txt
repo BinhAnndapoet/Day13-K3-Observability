@@ -1,0 +1,10 @@
+--- Dashboard summary (nguon: data/logs.jsonl) ---
+Cua so: 2026-08-11 04:24:10Z -> 04:30:09Z | 15 request | 0 loi
+[OK ] latency  p95            =     2,651 ms  (nguong <= 3000.0)
+[OK ] traffic  rate_per_minute =       5.0/ph  (nguong >= 1.0)
+[OK ] errors   error_rate_pct =        0.00%  (nguong <= 2.0)
+[OK ] cost     total          =      $0.0303  (nguong <= 2.5)
+[OK ] tokens   sum_by_field   =        1,924  (nguong <= 50000.0)
+[OK ] quality  mean           =         0.86  (nguong >= 0.75)
+
+Dashboard: submission\evidence\dashboard_challenge.html

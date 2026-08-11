@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from collections import Counter
 from statistics import mean
 
@@ -29,10 +30,12 @@ def record_error(error_type: str) -> None:
 
 
 def percentile(values: list[int], p: int) -> float:
+    """Nearest-rank percentile: gia tri nho nhat ma >= p% mau nam duoi no."""
     if not values:
         return 0.0
     items = sorted(values)
-    idx = max(0, min(len(items) - 1, round((p / 100) * len(items) + 0.5) - 1))
+    rank = math.ceil((p / 100) * len(items))
+    idx = max(0, min(len(items) - 1, rank - 1))
     return float(items[idx])
 
 
