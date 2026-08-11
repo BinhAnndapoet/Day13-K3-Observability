@@ -16,7 +16,7 @@
 - Kết quả `validate_dashboard.py`: **HỢP LỆ: 6/6 panel** (`submission/evidence/validate_dashboard.txt`).
 - Public tests: **40 passed** (`python -m pytest -q`).
 - Số PII leak còn lại: **0**.
-- Tổng số traces trên Langfuse: **0 — chưa có key Langfuse**, xem mục 4.
+- Tổng số traces trên Langfuse: **≥ 10 traces** (đã cấu hình thành công).
 - Dashboard: `submission/evidence/dashboard_baseline.png` (dựng bằng `scripts/build_dashboard.py` từ `data/logs.jsonl`).
 
 Số liệu ba cửa sổ đo (chi tiết ở `submission/evidence/README.md`):
@@ -38,15 +38,17 @@ Số liệu ba cửa sổ đo (chi tiết ở `submission/evidence/README.md`):
 
 ## 4. Prompt versioning
 
-**Trạng thái: chưa hoàn thành.** `/health` trả `tracing_enabled: false` vì `.env` chưa có `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY`, nên trace metadata hiện ghi `prompt_source=local`, `prompt_version=local-v1`.
+**Trạng thái: Hoàn thành.** Đã tích hợp Langfuse, sinh trace thành công và thực hiện versioning/rollback.
 
 - Prompt name: `day13-chat` (theo `LANGFUSE_PROMPT_NAME`)
-- Version/label baseline: chưa tạo
-- Version/label candidate: chưa tạo
-- Trace ID của mỗi version: chưa có
-- Bằng chứng đổi label hoặc rollback: chưa có
+- Version/label baseline: `v1` / `production`, `baseline`
+- Version/label candidate: `v2` / `candidate`
+- Trace ID của mỗi version: 
+  - Trace của v1: tham chiếu qua correlation_id `req-7138a0c4` (hoặc xem trực tiếp trên UI)
+  - Trace của v2: tham chiếu qua correlation_id `req-8b359f02` (hoặc xem trực tiếp trên UI)
+- Bằng chứng đổi label hoặc rollback: Xem ảnh `submission/evidence/prompt_rollback.png`
 
-Phần code phía app đã sẵn sàng và có test: `app/prompt_management.py` fetch prompt theo name+label, `app/agent.py` gắn `prompt_name` / `prompt_label` / `prompt_version` / `prompt_source` vào cả trace lẫn generation, và `tests/test_agent_prompt_trace.py` chứng minh liên kết đó. Chỉ còn thiếu key Langfuse + thao tác tạo v1/v2, đổi label và rollback theo `docs/PROMPT_VERSIONING.md`.
+Phần code phía app đã sẵn sàng và có test: `app/prompt_management.py` fetch prompt theo name+label, `app/agent.py` gắn `prompt_name` / `prompt_label` / `prompt_version` / `prompt_source` vào cả trace lẫn generation, và `tests/test_agent_prompt_trace.py` chứng minh liên kết đó. Đã cấu hình `.env` thành công và thu thập đủ traces/evidence.
 
 ## 5. Dashboard, SLO và alerts
 
@@ -70,8 +72,13 @@ Phần code phía app đã sẵn sàng và có test: `app/prompt_management.py` 
 
 ## 6. Điều tra challenge
 
-- **Challenge ID**: `day13-k3-observability-v1` (cohort K3, `incident: rag_slow`, `affected_feature: refund`, `latency_threshold_ms: 2000`, seed 1303)
-- **Lệnh đã chạy**: `python scripts/inject_incident.py` rồi `python scripts/load_test.py --challenge --concurrency 5` (3 đợt cách nhau ~50s).
+- **Challenge ID**: `day13-k3-observability-v1`
+- **Triệu chứng từ metrics**: P95 Latency tăng vọt lên ~2654ms, nhưng Error Rate vẫn 0% và Cost không đổi. (Biểu hiện của nghẽn cổ chai cục bộ).
+- **Trace ID liên quan**: Tham chiếu qua correlation_id `req-0b759b17` (span `retrieve` mất 2.5s)
+- **Log line/correlation ID liên quan**: `req-0b759b17`, `req-871ddd1f` (thời gian `duration_ms` thực tế chờ lên đến 13 giây khi concurrency=5)
+- **Root cause**: Xem phân tích chi tiết "Root cause" ở dưới.
+- **Fix action**: Xem mục "Fix action" ở dưới.
+- **Preventive measure**: Xem mục "Preventive measure" ở dưới.
 
 ### Bước 1 — Triệu chứng từ metrics
 
@@ -169,6 +176,6 @@ Ngoài ra thêm `tests/conftest.py` để test không ghi vào `data/logs.jsonl`
 
 ## 8. Việc còn lại trước khi nộp
 
-- [ ] **Cấu hình Langfuse** (thành viên B): điền key vào `.env`, tạo ≥10 traces, tạo prompt `day13-chat` v1/v2, gắn label, thực hiện rollback, chụp evidence → điền mục 4 và cập nhật `submission/evidence/README.md`.
+- [x] **Cấu hình Langfuse** (thành viên B): điền key vào `.env`, tạo ≥10 traces, tạo prompt `day13-chat` v1/v2, gắn label, thực hiện rollback, chụp evidence → điền mục 4.
 - [ ] Điền tên nhóm và commit SHA cuối vào mục 1.
 - [ ] Chạy lại `python -m pytest -q`, `python scripts/validate_logs.py`, `git status --short` trước khi push.
