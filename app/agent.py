@@ -9,6 +9,7 @@ from .mock_rag import retrieve
 from .pii import hash_user_id, summarize_text
 from .prompt_management import resolve_prompt
 from .tracing import get_langfuse_client, observe, tracing_enabled
+from structlog.contextvars import get_contextvars
 
 
 @dataclass
@@ -52,6 +53,7 @@ class LabAgent:
                 "prompt_label": prompt.label,
                 "prompt_version": prompt.version,
                 "prompt_source": prompt.source,
+                "correlation_id": get_contextvars().get("correlation_id", "MISSING") # Thêm dòng này
             },
         )
         langfuse_client.update_current_generation(
