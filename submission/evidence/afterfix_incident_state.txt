@@ -1,0 +1,3 @@
+=== rag_slow VAN BAT — chi thay doi cach xu ly blocking I/O
+200 {'ok': True, 'incidents': {'rag_slow': True, 'tool_fail': False, 'cost_spike': False}}
+200 {'ok': True, 'incidents': {'rag_slow': False, 'tool_fail': False, 'cost_spike': False}}

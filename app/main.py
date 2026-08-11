@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 from structlog.contextvars import bind_contextvars
 
@@ -14,7 +15,6 @@ from .middleware import CorrelationIdMiddleware
 from .pii import hash_user_id, summarize_text
 from .schemas import ChatRequest, ChatResponse
 from .tracing import tracing_enabled
-from fastapi.responses import JSONResponse
 
 configure_logging()
 log = get_logger()
@@ -24,10 +24,21 @@ agent = LabAgent()
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    # Loi roi ra ngoai handler cua route van phai de lai log + metric,
+    # neu khong se co 500 "cam" khong xuat hien tren panel Errors.
     correlation_id = getattr(request.state, "correlation_id", "unknown")
+    error_type = type(exc).__name__
+    record_error(error_type)
+    log.error(
+        "request_failed",
+        service="api",
+        error_type=error_type,
+        correlation_id=correlation_id,
+        payload={"detail": str(exc), "path": request.url.path},
+    )
     return JSONResponse(
         status_code=500,
-        content={"detail": type(exc).__name__},
+        content={"detail": error_type},
         headers={"x-request-id": correlation_id},
     )
 
@@ -53,14 +64,12 @@ async def metrics() -> dict:
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: Request, body: ChatRequest) -> ChatResponse:
-    # TODO: Enrich logs with request context (user_id_hash, session_id, feature, model, env)
-    # bind_contextvars(...)
-
+    # Bind truoc dong log dau tien de moi log sau do deu co day du context.
     bind_contextvars(
         user_id_hash=hash_user_id(body.user_id),
         session_id=body.session_id,
         feature=body.feature,
-        model="claude-sonnet-4-5",
+        model=agent.model,
         env=os.getenv("APP_ENV", "dev"),
     )
     
@@ -70,7 +79,12 @@ async def chat(request: Request, body: ChatRequest) -> ChatResponse:
         payload={"message_preview": summarize_text(body.message)},
     )
     try:
-        result = agent.run(
+        # agent.run goi retrieve()/LLM bang I/O dong bo (time.sleep). Goi truc tiep
+        # trong route async se chan event loop: moi request cham lam TAT CA request
+        # khac phai xep hang. Day sang threadpool de do tre chi anh huong dung request
+        # cua no. run_in_threadpool copy contextvars nen correlation_id van giu nguyen.
+        result = await run_in_threadpool(
+            agent.run,
             user_id=body.user_id,
             feature=body.feature,
             session_id=body.session_id,

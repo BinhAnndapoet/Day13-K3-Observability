@@ -1,0 +1,18 @@
+Challenge: day13-k3-observability-v1 | Cohort: K3
+[200] req-6bdb3f69 | refund | 2680.5ms
+[200] req-705a84dc | refund | 2699.4ms
+[200] req-8dfb9a44 | refund | 2704.9ms
+[200] req-81e5d5b6 | refund | 2707.3ms
+[200] req-eae79c4b | refund | 2705.5ms
+Challenge: day13-k3-observability-v1 | Cohort: K3
+[200] req-d704f6aa | refund | 2677.9ms
+[200] req-bb452090 | refund | 2685.6ms
+[200] req-a7833598 | refund | 2692.6ms
+[200] req-6b841b0d | refund | 2701.9ms
+[200] req-b638a65c | refund | 2700.4ms
+Challenge: day13-k3-observability-v1 | Cohort: K3
+[200] req-86fe1ab1 | refund | 2695.2ms
+[200] req-e8ed3d1d | refund | 2720.7ms
+[200] req-5ea0ab0c | refund | 2720.1ms
+[200] req-08d500e6 | refund | 2719.5ms
+[200] req-30bcec19 | refund | 2718.6ms

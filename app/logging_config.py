@@ -23,17 +23,20 @@ class JsonlFileProcessor:
 
 
 
-def scrub_event(_: Any, __: str, event_dict: dict[str, Any]) -> dict[str, Any]:
-    for key, val in event_dict.items():
-        if isinstance(val, str):
-            event_dict[key] = scrub_text(val)
-        elif isinstance(val, dict):
-            event_dict[key] = {
-                k: scrub_text(v) if isinstance(v, str) else v for k, v in val.items()
-            }
-    return event_dict
+def _scrub_value(value: Any) -> Any:
+    if isinstance(value, str):
+        return scrub_text(value)
+    if isinstance(value, dict):
+        return {key: _scrub_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return type(value)(_scrub_value(item) for item in value)
+    return value
 
-# --- Bước 3: Bật PII Scrubbing ---
+
+def scrub_event(_: Any, __: str, event_dict: dict[str, Any]) -> dict[str, Any]:
+    return {key: _scrub_value(value) for key, value in event_dict.items()}
+
+
 def configure_logging() -> None:
     logging.basicConfig(format="%(message)s", level=getattr(logging, os.getenv("LOG_LEVEL", "INFO")))
     structlog.configure(
@@ -41,9 +44,11 @@ def configure_logging() -> None:
             merge_contextvars,
             structlog.processors.add_log_level,
             structlog.processors.TimeStamper(fmt="iso", utc=True, key="ts"),
-            scrub_event,  # ← Đã uncomment
+            # StackInfoRenderer/format_exc_info bien traceback thanh chuoi.
+            # scrub_event phai chay SAU chung, neu khong PII trong traceback se lot xuong file.
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
+            scrub_event,
             JsonlFileProcessor(),
             structlog.processors.JSONRenderer(),
         ],
