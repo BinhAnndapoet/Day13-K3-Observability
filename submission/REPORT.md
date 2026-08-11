@@ -31,10 +31,16 @@
 
 ## 5. Dashboard, SLO và alerts
 
-- Kết quả `validate_dashboard.py`:
-- Evidence dashboard:
+- Kết quả `validate_dashboard.py`: HỢP LỆ: 6/6 panel
+- Evidence dashboard: `submission/evidence/dashboard_6panels.png`
 - SLO đã chọn và lý do:
+  - `latency_p95_ms`: Objective ≤ 3000ms (Target: 99.5%) - Đảm bảo trải nghiệm phản hồi nhanh của người dùng.
+  - `error_rate_pct`: Objective ≤ 2% (Target: 99.0%) - Giữ tỉ lệ request thất bại ở mức tối thiểu.
+  - `daily_cost_usd`: Objective ≤ $2.5/ngày (Target: 100.0%) - Tránh vượt ngân sách API LLM.
+  - `quality_score_avg`: Objective ≥ 0.75 (Target: 95.0%) - Đảm bảo chất lượng câu trả lời từ RAG & LLM.
 - Alert rules và runbook:
+  - Alert rules: [config/alert_rules.yaml](file:///c:/Users/Tunnne/Downloads/code/Day13-K3-Observability/config/alert_rules.yaml) (Bao gồm `high_latency_p95`, `high_error_rate`, `cost_spike`)
+  - Alert runbook: [docs/alerts.md](file:///c:/Users/Tunnne/Downloads/code/Day13-K3-Observability/docs/alerts.md) (Quy trình 3 bước Metrics → Traces → Logs cho từng alert)
 
 ## 6. Điều tra challenge
 
@@ -52,4 +58,6 @@ Với mỗi thành viên, ghi rõ nhiệm vụ và link commit/PR tương ứng.
 
 | Thành viên | Phần việc | Commit/PR | Điều đã học |
 |---|---|---|---|
+| Thành viên B (SRE & Alerts Engineer) | Cấu hình Langfuse, thiết lập SLO (config/slo.yaml), Alert Rules (config/alert_rules.yaml), viết Runbook (docs/alerts.md) và validate Dashboard contract | Commit | Hiểu luồng khắc phục sự cố Metrics → Traces → Logs, cách đặt ngưỡng SLO dựa trên UX và chi phí, và thiết kế symptom-based alerts. |
 | | | | |
+
